@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DeckList Assistant
 // @namespace    https://github.com/luiztraghia/decklist-assistant
-// @version      6.2.0
+// @version      6.3.0
 // @description  Preenche listas de cartas com validação, relatório e atualizações via GitHub.
 // @author       Luiz Fernando Traghia e colaboradores
 // @license      MIT
@@ -25,7 +25,7 @@
   const APP = {
     id: 'decklist-assistant-v6',
     name: 'DeckList Assistant',
-    version: '6.2.0',
+    version: '6.3.0',
     storageKey: 'dla-v6-state',
     settingsKey: 'dla-v6-settings',
     defaultRepo: 'luiztraghia/decklist-assistant',
@@ -397,8 +397,10 @@
 
   function updateSpeedWarning() {
     const value=Number(els.typingDelay.value);
-    els.speedWarning.hidden=value!==60;
-    els.speedWarning.textContent='O modo rápido pode falhar se o site ou sua conexão estiverem lentos. Se isso acontecer, use Médio ou Lento.';
+    els.speedWarning.hidden=value>45;
+    els.speedWarning.textContent=value<=25
+      ? 'O modo Muito rápido pode impedir que o site abra as sugestões. Se houver falhas, use Rápido, Médio ou Lento.'
+      : 'O modo Rápido pode falhar se o site ou sua conexão estiverem lentos. Se isso acontecer, use Médio ou Lento.';
   }
 
   function setControls(active) {
@@ -414,7 +416,7 @@
   panel.id=APP.id;
   panel.dataset.theme='site';
   panel.innerHTML=`
-  <header><div><strong>${APP.name}</strong><small>v${APP.version} · projeto independente e open source</small></div><div class="header-actions"><button id="acl-donate">Doar</button><button id="acl-collapse">−</button></div></header>
+  <header><div><strong>${APP.name}</strong><small>v${APP.version} · projeto independente e open source</small></div><div class="header-actions"><button id="acl-collapse">−</button></div></header>
   <nav>${[['list','Lista'],['run','Execução'],['report','Relatório'],['settings','Configurações'],['contact','Contato'],['update','Atualizações']].map(([id,label])=>`<button data-tab="${id}">${label}</button>`).join('')}</nav>
   <main>
     <section class="tab-panel active" id="tab-list">
@@ -432,7 +434,7 @@
     </section>
     <section class="tab-panel" id="tab-report"><div class="report-actions"><button id="acl-copy-report">Copiar relatório</button><button id="acl-retry" disabled>Tentar falhas novamente</button></div><div id="acl-log" class="log"><div class="empty">Nenhum item processado.</div></div></section>
     <section class="tab-panel" id="tab-settings">
-      <div class="form-grid"><label>Velocidade<select id="acl-speed"><option value="60">Rápido</option><option value="110">Médio</option><option value="180">Lento</option></select></label>
+      <div class="form-grid"><label>Velocidade<select id="acl-speed"><option value="25">Muito rápido</option><option value="45">Rápido</option><option value="110">Médio</option><option value="180">Lento</option></select></label>
       <div id="acl-speed-warning" class="warning" hidden></div>
       </div>
       <div class="checks">
@@ -452,7 +454,7 @@
     </section>
     <section class="tab-panel" id="tab-update"><div class="version-card"><span>Versão atual</span><b id="acl-current-version">${APP.version}</b><span>Versão no GitHub</span><b id="acl-latest-version">—</b></div><p id="acl-update-status">Ainda não verificado.</p><div class="actions"><button id="acl-check-update" class="primary">Buscar atualizações</button><button id="acl-open-release" hidden>Abrir lançamento</button><button id="acl-install-release" hidden>Instalar atualização</button></div></section>
   </main>
-  <footer><span>Ferramenta independente, não afiliada à Liga One Piece.</span><button id="acl-footer-donate">Apoiar via PIX</button></footer>
+  <footer><span>Ferramenta independente, não afiliada à Liga One Piece.</span><button id="acl-footer-donate" class="pix-button"><span class="pix-symbol">◆</span> Apoiar via PIX</button></footer>
   <div id="acl-ambiguity" class="modal"></div>
   <div id="acl-donation" class="modal"><div class="modal-card donation"><button class="close" id="acl-close-donation">×</button><h2>Apoie o projeto</h2><p>Este projeto é gratuito e open source. Se ele economizou seu tempo, considere me ajudar a terminar meu deck. 😊</p><img src="${APP.qrDataUrl}" alt="QR Code PIX"><label>Chave PIX</label><div class="copy-row"><code>${APP.pixKey}</code><button id="acl-copy-key">Copiar</button></div><label>PIX Copia e Cola</label><textarea readonly id="acl-pix-payload">${APP.pixPayload}</textarea><button id="acl-copy-payload" class="primary wide">Copiar PIX Copia e Cola</button></div></div>`;
 
@@ -462,6 +464,7 @@
   #${APP.id}[data-theme="light"]{--acl-bg:#fff;--acl-panel:#f3f5f7;--acl-text:#202124;--acl-muted:#5f6368;--acl-border:#ccd0d5}
   #${APP.id}[data-theme="pirate"]{--acl-bg:#17150e;--acl-panel:#242014;--acl-text:#fff8dc;--acl-muted:#c8b987;--acl-border:#66541b;--acl-accent:#d7a20b}
   #${APP.id} *{box-sizing:border-box} #${APP.id} header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#111;color:#fff} #${APP.id} header strong,#${APP.id} header small{display:block} #${APP.id} header small{opacity:.7;font-size:11px} #${APP.id} button,#${APP.id} select,#${APP.id} input,#${APP.id} textarea{font:inherit} #${APP.id} button,#${APP.id} .file-btn{border:1px solid var(--acl-border);background:var(--acl-panel);color:var(--acl-text);border-radius:8px;padding:8px 10px;cursor:pointer;text-align:center} #${APP.id} button:hover,#${APP.id} .file-btn:hover{filter:brightness(1.12)} #${APP.id} button:disabled{opacity:.45;cursor:not-allowed} #${APP.id} .primary{background:var(--acl-accent);border-color:var(--acl-accent);color:#fff} #${APP.id} .danger{border-color:#c54848;color:#ff8c8c} #${APP.id} .ghost{background:transparent} #${APP.id} .wide{width:100%} #${APP.id} nav{display:flex;overflow-x:auto;background:var(--acl-panel);border-bottom:1px solid var(--acl-border)} #${APP.id} nav button{border:0;border-radius:0;background:transparent;white-space:nowrap;font-size:12px;padding:10px} #${APP.id} nav button.active{color:var(--acl-accent);box-shadow:inset 0 -2px var(--acl-accent)} #${APP.id} main{padding:13px;max-height:70vh;overflow:auto} #${APP.id} .tab-panel{display:none} #${APP.id} .tab-panel.active{display:block} #${APP.id} label{display:block;margin:8px 0 4px;font-weight:600} #${APP.id} textarea,#${APP.id} input,#${APP.id} select{width:100%;border:1px solid var(--acl-border);border-radius:8px;background:var(--acl-panel);color:var(--acl-text);padding:9px} #acl-input{height:155px;font-family:monospace} #${APP.id} .target,#${APP.id} .status,#${APP.id} .validation,#${APP.id} .warning{padding:9px;border-radius:8px;background:var(--acl-panel);margin-bottom:10px} #${APP.id} .target{color:#70e0a0} #${APP.id} .validation.good,#${APP.id} .status.success{color:#72e59f} #${APP.id} .validation.bad,#${APP.id} .status.error,#${APP.id} .warning{color:#ff8585} #${APP.id} .toolbar,#${APP.id} .actions,#${APP.id} .report-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0} #${APP.id} .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0} #${APP.id} .stats div{background:var(--acl-panel);padding:8px 4px;text-align:center;border-radius:8px} #${APP.id} .stats b,#${APP.id} .stats span{display:block} #${APP.id} .stats span{font-size:10px;color:var(--acl-muted)} #${APP.id} .dashboard{display:flex;gap:16px;align-items:center} #${APP.id} .ring{width:86px;height:86px;border-radius:50%;border:8px solid var(--acl-panel);display:grid;place-items:center;color:var(--acl-accent);font-weight:bold} #${APP.id} .progress-track{height:10px;background:var(--acl-panel);border-radius:999px;overflow:hidden;margin:12px 0} #acl-progress{height:100%;width:0;background:var(--acl-accent);transition:width .2s} #${APP.id} .log{display:grid;gap:6px} #${APP.id} .log-row{display:flex;gap:8px;padding:8px;background:var(--acl-panel);border-radius:8px} #${APP.id} .log-row.ok>span{color:#65df95} #${APP.id} .log-row.fail>span{color:#ff7777} #${APP.id} .log-row small{display:block;color:var(--acl-muted)} #${APP.id} .history-item{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--acl-border)} #${APP.id} .history-item small{display:block;color:var(--acl-muted)} #${APP.id} .section-head,#${APP.id} .lop-log-head{display:flex;justify-content:space-between;align-items:center} #${APP.id} .form-grid{display:grid;gap:5px} #${APP.id} .range-label output{float:right;color:var(--acl-accent)} #${APP.id} .checks{display:grid;gap:6px;margin:10px 0} #${APP.id} .checks label{font-weight:normal} #${APP.id} .checks input{width:auto;margin-right:7px} #${APP.id} .diagnostic div{display:grid;grid-template-columns:130px 1fr;gap:8px;padding:7px;border-bottom:1px solid var(--acl-border)} #${APP.id} .diagnostic span{word-break:break-word;color:var(--acl-muted)} #${APP.id} .version-card{display:grid;grid-template-columns:1fr auto;gap:8px;background:var(--acl-panel);padding:12px;border-radius:9px} #${APP.id} footer{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-top:1px solid var(--acl-border);font-size:10px;color:var(--acl-muted)} #${APP.id} footer button{font-size:11px;padding:5px 7px} #${APP.id} .modal{display:none;position:fixed;inset:0;background:#000a;z-index:2147483647;align-items:center;justify-content:center;padding:20px} #${APP.id} .modal.show{display:flex} #${APP.id} .modal-card{width:min(430px,95vw);max-height:90vh;overflow:auto;background:var(--acl-bg);border:1px solid var(--acl-border);border-radius:14px;padding:18px;position:relative} #${APP.id} .choice-list{display:grid;gap:6px} #${APP.id} .donation img{display:block;width:260px;max-width:100%;margin:10px auto;background:#fff;padding:8px;border-radius:10px} #${APP.id} .donation .close{position:absolute;right:10px;top:10px} #${APP.id} .copy-row{display:flex;gap:6px;align-items:center} #${APP.id} .copy-row code{flex:1;overflow:auto;background:var(--acl-panel);padding:9px;border-radius:8px} #acl-pix-payload{height:95px;font-size:11px} #${APP.id} .contact-card{background:var(--acl-panel);padding:15px;border-radius:10px} #${APP.id} .contact-card h3{margin-top:0} #${APP.id} .contact-email{display:flex;gap:7px;align-items:center;margin:12px 0} #${APP.id} .contact-email code{flex:1;overflow:auto;background:var(--acl-bg);padding:10px;border:1px solid var(--acl-border);border-radius:8px} #${APP.id} .contact-note{color:var(--acl-muted);font-size:12px} #${APP.id} .empty{color:var(--acl-muted);padding:14px;text-align:center}
+  #${APP.id} footer .pix-button{font-size:13px;font-weight:700;padding:9px 12px;color:#fff;background:#27b6a5;border-color:#27b6a5;white-space:nowrap} #${APP.id} .pix-symbol{display:inline-block;margin-right:3px;transform:rotate(45deg);font-size:12px}
   @media(max-width:600px){#${APP.id}{right:6px;bottom:6px;width:calc(100vw - 12px)} #${APP.id} .stats{grid-template-columns:repeat(3,1fr)}}
   `;
   document.documentElement.appendChild(style);document.body.appendChild(panel);
@@ -486,7 +489,7 @@
   els.typingDelay.onchange=updateSpeedWarning;$('#acl-save-settings').onclick=saveSettingsFromUi;
   $('#acl-copy-email').onclick=()=>{const email='luiz.traghia@gmail.com';typeof GM_setClipboard==='function'?GM_setClipboard(email):navigator.clipboard.writeText(email);setStatus('E-mail copiado.','success');};
   $('#acl-check-update').onclick=()=>checkUpdates(true);
-  const openDonation=()=>els.donation.classList.add('show');$('#acl-donate').onclick=openDonation;$('#acl-footer-donate').onclick=openDonation;$('#acl-close-donation').onclick=()=>els.donation.classList.remove('show');
+  const openDonation=()=>els.donation.classList.add('show');$('#acl-footer-donate').onclick=openDonation;$('#acl-close-donation').onclick=()=>els.donation.classList.remove('show');
   $('#acl-copy-key').onclick=()=>{typeof GM_setClipboard==='function'?GM_setClipboard(APP.pixKey):navigator.clipboard.writeText(APP.pixKey);setStatus('Chave PIX copiada.','success');};
   $('#acl-copy-payload').onclick=()=>{typeof GM_setClipboard==='function'?GM_setClipboard(APP.pixPayload):navigator.clipboard.writeText(APP.pixPayload);setStatus('PIX Copia e Cola copiado.','success');};
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.3.0
+
+- Adicionado o modo de velocidade Muito rápido.
+- O modo Rápido ficou mais veloz.
+- Removido o botão Doar do cabeçalho.
+- Botão Apoiar via PIX ampliado e destacado com símbolo e cor do PIX.
+
 ## 6.2.0
 
 - Adicionados filtros separados para ignorar Arte Alternativa, Parallel, SP e Manga.
