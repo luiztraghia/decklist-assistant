@@ -4,9 +4,7 @@ Assistente gratuito e open source para preencher automaticamente as decklists ou
 
 > Projeto independente, não afiliado, patrocinado ou aprovado pela Liga One Piece.
 
-## Instalação fácil
-
-Você não precisa baixar o projeto completo nem entender de programação. Siga os passos abaixo.
+## Instalação
 
 ### 1. Instale o Tampermonkey
 
