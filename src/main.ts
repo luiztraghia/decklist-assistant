@@ -5,7 +5,7 @@
   const APP = {
     id: 'decklist-assistant-v6',
     name: 'DeckList Assistant',
-    version: '6.3.0',
+    version: '6.4.0',
     storageKey: 'dla-v6-state',
     settingsKey: 'dla-v6-settings',
     defaultRepo: 'luiztraghia/decklist-assistant',
@@ -307,18 +307,6 @@
     els.retryFailures.disabled=!runner.results.some(r=>!r.ok);
   }
 
-  function exportTxt() {
-    const blob=new Blob([parsedCurrent.cards.map(c=>`${c.qty}x${c.code}`).join('\n')],{type:'text/plain;charset=utf-8'});
-    downloadBlob(blob,'lista-one-piece.txt');
-  }
-  function exportCsv() {
-    const rows=['quantidade,codigo',...parsedCurrent.cards.map(c=>`${c.qty},${c.code}`)];
-    downloadBlob(new Blob([rows.join('\n')],{type:'text/csv;charset=utf-8'}),'lista-one-piece.csv');
-  }
-  function downloadBlob(blob,name) {
-    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-  }
-
   function semverParts(v) { return String(v).replace(/^v/,'').split('.').map(n=>parseInt(n,10)||0); }
   function newer(a,b) { const A=semverParts(a),B=semverParts(b);for(let i=0;i<3;i++){if((A[i]||0)!==(B[i]||0))return (A[i]||0)>(B[i]||0);}return false; }
 
@@ -363,7 +351,10 @@
       ignoreSP:els.ignoreSP.checked,
       ignoreManga:els.ignoreManga.checked,
     };
-    saveJson(APP.settingsKey,settings);updateStats();setStatus('Velocidade salva.','success');
+    saveJson(APP.settingsKey,settings);updateStats();
+    els.settingsSaved.hidden=false;
+    clearTimeout(els.settingsSavedTimer);
+    els.settingsSavedTimer=setTimeout(()=>els.settingsSaved.hidden=true,3000);
   }
 
   function loadSettingsUi() {
@@ -396,13 +387,13 @@
   panel.id=APP.id;
   panel.dataset.theme='site';
   panel.innerHTML=`
-  <header><div><strong>${APP.name}</strong><small>v${APP.version} · projeto independente e open source</small></div><div class="header-actions"><button id="acl-collapse">−</button></div></header>
+  <header><div><strong>👒 ${APP.name}</strong><small>v${APP.version} · projeto independente e open source</small></div><div class="header-actions"><button id="acl-collapse">−</button></div></header>
   <nav>${[['list','Lista'],['run','Execução'],['report','Relatório'],['settings','Configurações'],['contact','Contato'],['update','Atualizações']].map(([id,label])=>`<button data-tab="${id}">${label}</button>`).join('')}</nav>
   <main>
     <section class="tab-panel active" id="tab-list">
       <div class="target" id="acl-target">Clique no campo “Adicione a lista de cards”.</div>
       <label>Lista de cartas</label><textarea id="acl-input" placeholder="4xEB03-053\n3xOP06-116\n2xST30-012"></textarea>
-      <div class="toolbar"><label class="file-btn">Importar TXT<input type="file" id="acl-file" accept=".txt,text/plain" hidden></label><button id="acl-export-txt">Exportar TXT</button><button id="acl-export-csv">Exportar CSV</button><button id="acl-clear">Limpar</button></div>
+      <div class="toolbar"><button id="acl-clear">Limpar</button></div>
       <div class="stats"><div><b id="s-unique">0</b><span>Códigos</span></div><div><b id="s-units">0</b><span>Unidades</span></div><div><b id="s-dup">0</b><span>Duplicados</span></div><div><b id="s-invalid">0</b><span>Inválidos</span></div><div><b id="s-time">0s</b><span>Estimativa</span></div></div>
       <div id="acl-validation" class="validation good">Lista válida.</div>
       <button id="acl-start" class="primary wide">Iniciar preenchimento</button>
@@ -424,6 +415,7 @@
         <label><input type="checkbox" id="acl-ignore-manga">Ignorar Manga</label>
       </div>
       <button id="acl-save-settings" class="primary">Salvar configurações</button>
+      <div id="acl-settings-saved" class="settings-saved" hidden>✅ Alterações salvas</div>
     </section>
     <section class="tab-panel" id="tab-contact">
       <div class="contact-card">
@@ -432,7 +424,7 @@
         <div class="contact-email"><code id="acl-contact-email">luiz.traghia@gmail.com</code><button id="acl-copy-email">Copiar e-mail</button></div>
       </div>
     </section>
-    <section class="tab-panel" id="tab-update"><div class="version-card"><span>Versão atual</span><b id="acl-current-version">${APP.version}</b><span>Versão no GitHub</span><b id="acl-latest-version">—</b></div><p id="acl-update-status">Ainda não verificado.</p><div class="actions"><button id="acl-check-update" class="primary">Buscar atualizações</button><button id="acl-open-release" hidden>Abrir lançamento</button><button id="acl-install-release" hidden>Instalar atualização</button></div></section>
+    <section class="tab-panel" id="tab-update"><div class="version-card"><span>Versão atual</span><b id="acl-current-version">${APP.version}</b><span>Versão no GitHub</span><b id="acl-latest-version">—</b></div><p id="acl-update-status">Ainda não verificado.</p><div class="actions"><button id="acl-check-update" class="primary">Buscar atualizações</button><button id="acl-open-release" hidden>Abrir lançamento</button><button id="acl-install-release" hidden>Instalar atualização</button><button id="acl-update-guide">Passo a passo para atualizar</button></div><div id="acl-update-guide-content" class="update-guide" hidden><h3>Como atualizar</h3><ol><li>Clique em <b>Buscar atualizações</b>.</li><li>Quando uma nova versão aparecer, clique em <b>Instalar atualização</b>.</li><li>O Tampermonkey abrirá a tela da nova versão.</li><li>Clique em <b>Atualizar</b> ou <b>Instalar</b>.</li><li>Volte à página da Liga e atualize a página.</li></ol><p>Se o botão de instalação não aparecer, clique em <b>Abrir lançamento</b>, abra o arquivo <code>.user.js</code> da versão e confirme a atualização no Tampermonkey.</p></div></section>
   </main>
   <footer><span>Ferramenta independente, não afiliada à Liga One Piece.</span><button id="acl-footer-donate" class="pix-button"><span class="pix-symbol">◆</span> Apoiar via PIX</button></footer>
   <div id="acl-ambiguity" class="modal"></div>
@@ -444,14 +436,14 @@
   #${APP.id}[data-theme="light"]{--acl-bg:#fff;--acl-panel:#f3f5f7;--acl-text:#202124;--acl-muted:#5f6368;--acl-border:#ccd0d5}
   #${APP.id}[data-theme="pirate"]{--acl-bg:#17150e;--acl-panel:#242014;--acl-text:#fff8dc;--acl-muted:#c8b987;--acl-border:#66541b;--acl-accent:#d7a20b}
   #${APP.id} *{box-sizing:border-box} #${APP.id} header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#111;color:#fff} #${APP.id} header strong,#${APP.id} header small{display:block} #${APP.id} header small{opacity:.7;font-size:11px} #${APP.id} button,#${APP.id} select,#${APP.id} input,#${APP.id} textarea{font:inherit} #${APP.id} button,#${APP.id} .file-btn{border:1px solid var(--acl-border);background:var(--acl-panel);color:var(--acl-text);border-radius:8px;padding:8px 10px;cursor:pointer;text-align:center} #${APP.id} button:hover,#${APP.id} .file-btn:hover{filter:brightness(1.12)} #${APP.id} button:disabled{opacity:.45;cursor:not-allowed} #${APP.id} .primary{background:var(--acl-accent);border-color:var(--acl-accent);color:#fff} #${APP.id} .danger{border-color:#c54848;color:#ff8c8c} #${APP.id} .ghost{background:transparent} #${APP.id} .wide{width:100%} #${APP.id} nav{display:flex;overflow-x:auto;background:var(--acl-panel);border-bottom:1px solid var(--acl-border)} #${APP.id} nav button{border:0;border-radius:0;background:transparent;white-space:nowrap;font-size:12px;padding:10px} #${APP.id} nav button.active{color:var(--acl-accent);box-shadow:inset 0 -2px var(--acl-accent)} #${APP.id} main{padding:13px;max-height:70vh;overflow:auto} #${APP.id} .tab-panel{display:none} #${APP.id} .tab-panel.active{display:block} #${APP.id} label{display:block;margin:8px 0 4px;font-weight:600} #${APP.id} textarea,#${APP.id} input,#${APP.id} select{width:100%;border:1px solid var(--acl-border);border-radius:8px;background:var(--acl-panel);color:var(--acl-text);padding:9px} #acl-input{height:155px;font-family:monospace} #${APP.id} .target,#${APP.id} .status,#${APP.id} .validation,#${APP.id} .warning{padding:9px;border-radius:8px;background:var(--acl-panel);margin-bottom:10px} #${APP.id} .target{color:#70e0a0} #${APP.id} .validation.good,#${APP.id} .status.success{color:#72e59f} #${APP.id} .validation.bad,#${APP.id} .status.error,#${APP.id} .warning{color:#ff8585} #${APP.id} .toolbar,#${APP.id} .actions,#${APP.id} .report-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0} #${APP.id} .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0} #${APP.id} .stats div{background:var(--acl-panel);padding:8px 4px;text-align:center;border-radius:8px} #${APP.id} .stats b,#${APP.id} .stats span{display:block} #${APP.id} .stats span{font-size:10px;color:var(--acl-muted)} #${APP.id} .dashboard{display:flex;gap:16px;align-items:center} #${APP.id} .ring{width:86px;height:86px;border-radius:50%;border:8px solid var(--acl-panel);display:grid;place-items:center;color:var(--acl-accent);font-weight:bold} #${APP.id} .progress-track{height:10px;background:var(--acl-panel);border-radius:999px;overflow:hidden;margin:12px 0} #acl-progress{height:100%;width:0;background:var(--acl-accent);transition:width .2s} #${APP.id} .log{display:grid;gap:6px} #${APP.id} .log-row{display:flex;gap:8px;padding:8px;background:var(--acl-panel);border-radius:8px} #${APP.id} .log-row.ok>span{color:#65df95} #${APP.id} .log-row.fail>span{color:#ff7777} #${APP.id} .log-row small{display:block;color:var(--acl-muted)} #${APP.id} .history-item{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--acl-border)} #${APP.id} .history-item small{display:block;color:var(--acl-muted)} #${APP.id} .section-head,#${APP.id} .lop-log-head{display:flex;justify-content:space-between;align-items:center} #${APP.id} .form-grid{display:grid;gap:5px} #${APP.id} .range-label output{float:right;color:var(--acl-accent)} #${APP.id} .checks{display:grid;gap:6px;margin:10px 0} #${APP.id} .checks label{font-weight:normal} #${APP.id} .checks input{width:auto;margin-right:7px} #${APP.id} .diagnostic div{display:grid;grid-template-columns:130px 1fr;gap:8px;padding:7px;border-bottom:1px solid var(--acl-border)} #${APP.id} .diagnostic span{word-break:break-word;color:var(--acl-muted)} #${APP.id} .version-card{display:grid;grid-template-columns:1fr auto;gap:8px;background:var(--acl-panel);padding:12px;border-radius:9px} #${APP.id} footer{display:flex;justify-content:space-between;align-items:center;padding:9px 13px;border-top:1px solid var(--acl-border);font-size:10px;color:var(--acl-muted)} #${APP.id} footer button{font-size:11px;padding:5px 7px} #${APP.id} .modal{display:none;position:fixed;inset:0;background:#000a;z-index:2147483647;align-items:center;justify-content:center;padding:20px} #${APP.id} .modal.show{display:flex} #${APP.id} .modal-card{width:min(430px,95vw);max-height:90vh;overflow:auto;background:var(--acl-bg);border:1px solid var(--acl-border);border-radius:14px;padding:18px;position:relative} #${APP.id} .choice-list{display:grid;gap:6px} #${APP.id} .donation img{display:block;width:260px;max-width:100%;margin:10px auto;background:#fff;padding:8px;border-radius:10px} #${APP.id} .donation .close{position:absolute;right:10px;top:10px} #${APP.id} .copy-row{display:flex;gap:6px;align-items:center} #${APP.id} .copy-row code{flex:1;overflow:auto;background:var(--acl-panel);padding:9px;border-radius:8px} #acl-pix-payload{height:95px;font-size:11px} #${APP.id} .contact-card{background:var(--acl-panel);padding:15px;border-radius:10px} #${APP.id} .contact-card h3{margin-top:0} #${APP.id} .contact-email{display:flex;gap:7px;align-items:center;margin:12px 0} #${APP.id} .contact-email code{flex:1;overflow:auto;background:var(--acl-bg);padding:10px;border:1px solid var(--acl-border);border-radius:8px} #${APP.id} .contact-note{color:var(--acl-muted);font-size:12px} #${APP.id} .empty{color:var(--acl-muted);padding:14px;text-align:center}
-  #${APP.id} footer .pix-button{font-size:13px;font-weight:700;padding:9px 12px;color:#fff;background:#27b6a5;border-color:#27b6a5;white-space:nowrap} #${APP.id} .pix-symbol{display:inline-block;margin-right:3px;transform:rotate(45deg);font-size:12px}
+  #${APP.id} footer .pix-button{font-size:13px;font-weight:700;padding:9px 12px;color:#fff;background:#27b6a5;border-color:#27b6a5;white-space:nowrap} #${APP.id} .pix-symbol{display:inline-block;margin-right:3px;transform:rotate(45deg);font-size:12px} #${APP.id} .settings-saved{margin-top:10px;padding:9px;border-radius:8px;background:#173d28;color:#65df95;font-weight:700;text-align:center} #${APP.id} .update-guide{margin-top:12px;padding:12px;background:var(--acl-panel);border-radius:9px} #${APP.id} .update-guide h3{margin-top:0} #${APP.id} .update-guide ol{padding-left:22px} #${APP.id} .update-guide li{margin:7px 0}
   @media(max-width:600px){#${APP.id}{right:6px;bottom:6px;width:calc(100vw - 12px)} #${APP.id} .stats{grid-template-columns:repeat(3,1fr)}}
   `;
   document.documentElement.appendChild(style);document.body.appendChild(panel);
 
   const $=s=>panel.querySelector(s);
   const els={
-    input:$('#acl-input'),file:$('#acl-file'),target:$('#acl-target'),statUnique:$('#s-unique'),statUnits:$('#s-units'),statDup:$('#s-dup'),statInvalid:$('#s-invalid'),statTime:$('#s-time'),invalidBox:$('#acl-validation'),start:$('#acl-start'),pause:$('#acl-pause'),stop:$('#acl-stop'),progress:$('#acl-progress'),progressText:$('#acl-progress-text'),current:$('#acl-current'),remaining:$('#acl-remaining'),status:$('#acl-status'),log:$('#acl-log'),retryFailures:$('#acl-retry'),typingDelay:$('#acl-speed'),speedWarning:$('#acl-speed-warning'),ignoreAlternateArt:$('#acl-ignore-aa'),ignoreParallel:$('#acl-ignore-parallel'),ignoreSP:$('#acl-ignore-sp'),ignoreManga:$('#acl-ignore-manga'),updateCurrent:$('#acl-current-version'),updateLatest:$('#acl-latest-version'),updateStatus:$('#acl-update-status'),updateOpen:$('#acl-open-release'),updateInstall:$('#acl-install-release'),ambiguity:$('#acl-ambiguity'),donation:$('#acl-donation')
+    input:$('#acl-input'),target:$('#acl-target'),statUnique:$('#s-unique'),statUnits:$('#s-units'),statDup:$('#s-dup'),statInvalid:$('#s-invalid'),statTime:$('#s-time'),invalidBox:$('#acl-validation'),start:$('#acl-start'),pause:$('#acl-pause'),stop:$('#acl-stop'),progress:$('#acl-progress'),progressText:$('#acl-progress-text'),current:$('#acl-current'),remaining:$('#acl-remaining'),status:$('#acl-status'),log:$('#acl-log'),retryFailures:$('#acl-retry'),typingDelay:$('#acl-speed'),speedWarning:$('#acl-speed-warning'),ignoreAlternateArt:$('#acl-ignore-aa'),ignoreParallel:$('#acl-ignore-parallel'),ignoreSP:$('#acl-ignore-sp'),ignoreManga:$('#acl-ignore-manga'),settingsSaved:$('#acl-settings-saved'),settingsSavedTimer:null,updateCurrent:$('#acl-current-version'),updateLatest:$('#acl-latest-version'),updateStatus:$('#acl-update-status'),updateOpen:$('#acl-open-release'),updateInstall:$('#acl-install-release'),ambiguity:$('#acl-ambiguity'),donation:$('#acl-donation')
   };
 
   panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
@@ -459,8 +451,7 @@
   $('#acl-collapse').onclick=()=>{const m=panel.querySelector('main'),n=panel.querySelector('nav'),f=panel.querySelector('footer');const hidden=m.style.display==='none';m.style.display=hidden?'block':'none';n.style.display=hidden?'flex':'none';f.style.display=hidden?'flex':'none';$('#acl-collapse').textContent=hidden?'−':'+';};
   document.addEventListener('focusin',e=>{if(!panel.contains(e.target)&&isEditable(e.target)){targetField=e.target;els.target.textContent=`Campo selecionado: ${targetField.id||targetField.name||targetField.tagName.toLowerCase()}`;}},true);
   els.input.addEventListener('input',updateStats);
-  els.file.onchange=async()=>{const file=els.file.files?.[0];if(file){els.input.value=await file.text();updateStats();}};
-  $('#acl-export-txt').onclick=exportTxt;$('#acl-export-csv').onclick=exportCsv;$('#acl-clear').onclick=()=>{els.input.value='';updateStats();};
+  $('#acl-clear').onclick=()=>{els.input.value='';updateStats();};
   els.start.onclick=()=>{parsedCurrent=parseList(els.input.value);if(!parsedCurrent.cards.length)return setStatus('Nenhuma carta válida.','error');if(parsedCurrent.invalid.length&&!confirm(`${parsedCurrent.invalid.length} linha(s) inválida(s) serão ignoradas. Continuar?`))return;targetField=targetField||detectTarget();if(!targetField)return setStatus('Clique primeiro no campo da lista no site.','error');showTab('run');runCards(parsedCurrent.cards);};
   els.pause.onclick=()=>{runner.paused=!runner.paused;els.pause.textContent=runner.paused?'Continuar':'Pausar';setStatus(runner.paused?'Execução pausada.':'Execução retomada.',runner.paused?'info':'working');};
   els.stop.onclick=()=>{runner.cancelled=true;runner.paused=false;};
@@ -469,6 +460,7 @@
   els.typingDelay.onchange=updateSpeedWarning;$('#acl-save-settings').onclick=saveSettingsFromUi;
   $('#acl-copy-email').onclick=()=>{const email='luiz.traghia@gmail.com';typeof GM_setClipboard==='function'?GM_setClipboard(email):navigator.clipboard.writeText(email);setStatus('E-mail copiado.','success');};
   $('#acl-check-update').onclick=()=>checkUpdates(true);
+  $('#acl-update-guide').onclick=()=>{const guide=$('#acl-update-guide-content');guide.hidden=!guide.hidden;$('#acl-update-guide').textContent=guide.hidden?'Passo a passo para atualizar':'Ocultar passo a passo';};
   const openDonation=()=>els.donation.classList.add('show');$('#acl-footer-donate').onclick=openDonation;$('#acl-close-donation').onclick=()=>els.donation.classList.remove('show');
   $('#acl-copy-key').onclick=()=>{typeof GM_setClipboard==='function'?GM_setClipboard(APP.pixKey):navigator.clipboard.writeText(APP.pixKey);setStatus('Chave PIX copiada.','success');};
   $('#acl-copy-payload').onclick=()=>{typeof GM_setClipboard==='function'?GM_setClipboard(APP.pixPayload):navigator.clipboard.writeText(APP.pixPayload);setStatus('PIX Copia e Cola copiado.','success');};

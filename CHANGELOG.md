@@ -1,5 +1,12 @@
 # Changelog
 
+## 6.4.0
+
+- Removidas as opções de importar TXT, exportar TXT e exportar CSV.
+- Adicionada confirmação verde ao salvar as configurações.
+- Adicionado passo a passo de atualização na aba Atualizações.
+- Adicionado emoji de chapéu de palha ao lado do nome DeckList Assistant.
+
 ## 6.3.0
 
 - Adicionado o modo de velocidade Muito rápido.
