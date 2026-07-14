@@ -1,6 +1,6 @@
 {
   "name": "decklist-assistant",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "private": true,
   "description": "Assistente open source para preenchimento da função Comprar por Lista.",
   "type": "module",
@@ -23,5 +23,10 @@
     "typescript-eslint": "^8.0.0",
     "vite": "^6.0.0",
     "vite-plugin-monkey": "^5.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

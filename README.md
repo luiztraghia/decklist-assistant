@@ -12,10 +12,10 @@ Instale a extensão Tampermonkey no Chrome, Edge ou Firefox.
 
 ### 2. Instale o DeckList Assistant
 
-Depois que este repositório estiver publicado, use o link abaixo, substituindo `SEU_USUARIO` pelo seu usuário do GitHub:
+Depois que este repositório estiver publicado, use o link abaixo:
 
 ```text
-https://raw.githubusercontent.com/SEU_USUARIO/decklist-assistant/main/dist/decklist-assistant.user.js
+https://raw.githubusercontent.com/luiztraghia/decklist-assistant/main/dist/decklist-assistant.user.js
 ```
 
 Ao abrir o link, o Tampermonkey exibirá a tela de instalação. Clique em **Instalar**.
@@ -38,11 +38,9 @@ Confira a validação e clique em **Iniciar preenchimento**.
 
 - Validação e normalização da lista.
 - Soma automática de códigos duplicados.
-- Histórico e restauração de sessão no navegador.
-- Controle detalhado de velocidade com alertas de risco.
-- Seleção preferencial da impressão padrão.
+- Três modos simples de velocidade: Rápido, Médio e Lento.
 - Relatório, exportação TXT/CSV e repetição das falhas.
-- Temas, diagnóstico, contato e doações PIX.
+- Contato e doações PIX.
 - Atualizações por GitHub Releases e mecanismo nativo do Tampermonkey.
 
 ## Como publicar no GitHub
@@ -53,10 +51,9 @@ Resumo:
 
 1. Crie um repositório público chamado `decklist-assistant`.
 2. Envie todos os arquivos desta pasta.
-3. Substitua `SEU_USUARIO/decklist-assistant` no código pelo endereço real.
-4. Rode `npm install` e `npm run build`.
-5. Faça commit da pasta `dist`.
-6. Crie uma tag como `v6.0.0`; o GitHub Actions criará a Release.
+3. Rode `npm install` e `npm run build`.
+4. Faça commit da pasta `dist`.
+5. Crie uma tag como `v6.1.0`; o GitHub Actions criará a Release.
 
 ## Desenvolvimento
 
@@ -84,7 +81,7 @@ Há duas formas complementares:
 
 ## Privacidade
 
-Listas, histórico, sessão e preferências permanecem no navegador. O programa não lê senhas ou dados de pagamento e não envia as listas para servidores externos.
+A lista permanece na página e a preferência de velocidade fica no navegador. O programa não lê senhas ou dados de pagamento e não envia listas para servidores externos.
 
 ## Contato
 

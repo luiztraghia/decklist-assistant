@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import monkey from "vite-plugin-monkey";
 import pkg from "./package.json";
 
-const repository = process.env.GITHUB_REPOSITORY ?? "SEU_USUARIO/decklist-assistant";
+const repository = process.env.GITHUB_REPOSITORY ?? "luiztraghia/decklist-assistant";
 const rawBase = `https://raw.githubusercontent.com/${repository}/main/dist`;
 
 export default defineConfig({
@@ -13,7 +13,7 @@ export default defineConfig({
         name: "DeckList Assistant",
         namespace: `https://github.com/${repository}`,
         version: pkg.version,
-        description: "Preenche listas de cartas com validação, histórico, diagnóstico e atualizações via GitHub.",
+        description: "Preenche listas de cartas com validação, relatório e atualizações via GitHub.",
         author: "Luiz Fernando Traghia e colaboradores",
         license: "MIT",
         match: ["https://www.ligaonepiece.com.br/*"],
