@@ -39,6 +39,7 @@ Confira a validação e clique em **Iniciar preenchimento**.
 - Validação e normalização da lista.
 - Soma automática de códigos duplicados.
 - Três modos simples de velocidade: Rápido, Médio e Lento.
+- Filtros configuráveis para ignorar Arte Alternativa, Parallel, SP e Manga.
 - Relatório, exportação TXT/CSV e repetição das falhas.
 - Contato e doações PIX.
 - Atualizações por GitHub Releases e mecanismo nativo do Tampermonkey.

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DeckList Assistant
 // @namespace    https://github.com/luiztraghia/decklist-assistant
-// @version      6.1.0
+// @version      6.2.0
 // @description  Preenche listas de cartas com validação, relatório e atualizações via GitHub.
 // @author       Luiz Fernando Traghia e colaboradores
 // @license      MIT
@@ -25,7 +25,7 @@
   const APP = {
     id: 'decklist-assistant-v6',
     name: 'DeckList Assistant',
-    version: '6.1.0',
+    version: '6.2.0',
     storageKey: 'dla-v6-state',
     settingsKey: 'dla-v6-settings',
     defaultRepo: 'luiztraghia/decklist-assistant',
@@ -48,12 +48,15 @@
     betweenCardsDelay: 700,
     retries: 2,
     mergeDuplicates: true,
-    avoidVariants: true,
+    ignoreAlternateArt: true,
+    ignoreParallel: true,
+    ignoreSP: true,
+    ignoreManga: true,
     confirmAmbiguous: true,
     checkUpdatesOnStart: true
   };
 
-  let settings = loadJson(APP.settingsKey, DEFAULT_SETTINGS);
+  let settings = {...DEFAULT_SETTINGS,...loadJson(APP.settingsKey, {})};
   let targetField = null;
   let runner = { running:false, paused:false, cancelled:false, cards:[], results:[], index:0, startedAt:null };
   let parsedCurrent = { cards:[], invalid:[], duplicates:[], totalUnits:0 };
@@ -174,16 +177,20 @@
     const t=text.toUpperCase();
     const escaped=code.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     const exact=new RegExp(`\\(${escaped}\\)\\s*$`,'i').test(text);
-    const variant=/ALTERNATE|PARALLEL|MANGA|\bSP\b|-AA\)|-PA\)|-SP\)|-P\)|-PRB\)/i.test(text);
+    const alternate=/ALTERNATE(?: ART)?|ARTE ALTERNATIVA|-AA\)/i.test(text);
+    const parallel=/PARALLEL|-PA\)|-P\)|-PRB\)/i.test(text);
+    const sp=/\bSP\b|-SP\)/i.test(text);
+    const manga=/\bMANGA\b/i.test(text);
+    const variant=alternate||parallel||sp||manga;
+    const ignored=(settings.ignoreAlternateArt&&alternate)||(settings.ignoreParallel&&parallel)||(settings.ignoreSP&&sp)||(settings.ignoreManga&&manga);
     let score=0;
     if (exact) score-=1000;
-    if (settings.avoidVariants && variant) score+=500;
     score+=text.length;
-    return {exact,variant,score};
+    return {exact,variant,ignored,score};
   }
 
   function chooseSuggestion(code) {
-    const list=suggestionCandidates(code).map(x=>({...x,...classifySuggestion(x.text,code)})).sort((a,b)=>a.score-b.score);
+    const list=suggestionCandidates(code).map(x=>({...x,...classifySuggestion(x.text,code)})).filter(x=>!x.ignored).sort((a,b)=>a.score-b.score);
     if (!list.length) return {chosen:null,list:[]};
     const ambiguous=list.length>1 && list[0].score===list[1].score;
     return {chosen:list[0],list,ambiguous};
@@ -371,12 +378,20 @@
   function saveSettingsFromUi() {
     settings={...settings,
       typingDelay:Number(els.typingDelay.value),
+      ignoreAlternateArt:els.ignoreAlternateArt.checked,
+      ignoreParallel:els.ignoreParallel.checked,
+      ignoreSP:els.ignoreSP.checked,
+      ignoreManga:els.ignoreManga.checked,
     };
     saveJson(APP.settingsKey,settings);updateStats();setStatus('Velocidade salva.','success');
   }
 
   function loadSettingsUi() {
     els.typingDelay.value=String(settings.typingDelay);
+    els.ignoreAlternateArt.checked=settings.ignoreAlternateArt;
+    els.ignoreParallel.checked=settings.ignoreParallel;
+    els.ignoreSP.checked=settings.ignoreSP;
+    els.ignoreManga.checked=settings.ignoreManga;
     updateSpeedWarning();
   }
 
@@ -420,6 +435,12 @@
       <div class="form-grid"><label>Velocidade<select id="acl-speed"><option value="60">Rápido</option><option value="110">Médio</option><option value="180">Lento</option></select></label>
       <div id="acl-speed-warning" class="warning" hidden></div>
       </div>
+      <div class="checks">
+        <label><input type="checkbox" id="acl-ignore-aa">Ignorar Arte Alternativa</label>
+        <label><input type="checkbox" id="acl-ignore-parallel">Ignorar Parallel</label>
+        <label><input type="checkbox" id="acl-ignore-sp">Ignorar SP</label>
+        <label><input type="checkbox" id="acl-ignore-manga">Ignorar Manga</label>
+      </div>
       <button id="acl-save-settings" class="primary">Salvar configurações</button>
     </section>
     <section class="tab-panel" id="tab-contact">
@@ -447,7 +468,7 @@
 
   const $=s=>panel.querySelector(s);
   const els={
-    input:$('#acl-input'),file:$('#acl-file'),target:$('#acl-target'),statUnique:$('#s-unique'),statUnits:$('#s-units'),statDup:$('#s-dup'),statInvalid:$('#s-invalid'),statTime:$('#s-time'),invalidBox:$('#acl-validation'),start:$('#acl-start'),pause:$('#acl-pause'),stop:$('#acl-stop'),progress:$('#acl-progress'),progressText:$('#acl-progress-text'),current:$('#acl-current'),remaining:$('#acl-remaining'),status:$('#acl-status'),log:$('#acl-log'),retryFailures:$('#acl-retry'),typingDelay:$('#acl-speed'),speedWarning:$('#acl-speed-warning'),updateCurrent:$('#acl-current-version'),updateLatest:$('#acl-latest-version'),updateStatus:$('#acl-update-status'),updateOpen:$('#acl-open-release'),updateInstall:$('#acl-install-release'),ambiguity:$('#acl-ambiguity'),donation:$('#acl-donation')
+    input:$('#acl-input'),file:$('#acl-file'),target:$('#acl-target'),statUnique:$('#s-unique'),statUnits:$('#s-units'),statDup:$('#s-dup'),statInvalid:$('#s-invalid'),statTime:$('#s-time'),invalidBox:$('#acl-validation'),start:$('#acl-start'),pause:$('#acl-pause'),stop:$('#acl-stop'),progress:$('#acl-progress'),progressText:$('#acl-progress-text'),current:$('#acl-current'),remaining:$('#acl-remaining'),status:$('#acl-status'),log:$('#acl-log'),retryFailures:$('#acl-retry'),typingDelay:$('#acl-speed'),speedWarning:$('#acl-speed-warning'),ignoreAlternateArt:$('#acl-ignore-aa'),ignoreParallel:$('#acl-ignore-parallel'),ignoreSP:$('#acl-ignore-sp'),ignoreManga:$('#acl-ignore-manga'),updateCurrent:$('#acl-current-version'),updateLatest:$('#acl-latest-version'),updateStatus:$('#acl-update-status'),updateOpen:$('#acl-open-release'),updateInstall:$('#acl-install-release'),ambiguity:$('#acl-ambiguity'),donation:$('#acl-donation')
   };
 
   panel.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));

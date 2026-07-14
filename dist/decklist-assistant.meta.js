@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DeckList Assistant
 // @namespace    https://github.com/luiztraghia/decklist-assistant
-// @version      6.1.0
+// @version      6.2.0
 // @description  Preenche listas de cartas com validação, relatório e atualizações via GitHub.
 // @author       Luiz Fernando Traghia e colaboradores
 // @license      MIT

@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.2.0
+
+- Adicionados filtros separados para ignorar Arte Alternativa, Parallel, SP e Manga.
+- Os filtros ficam ativados por padrão e podem ser alterados na aba Configurações.
+
 ## 6.1.0
 
 - Interface simplificada, sem as abas Histórico e Diagnóstico.
