@@ -1,30 +1,46 @@
-# DeckList Assistant
+# 👒 DeckList Assistant
 
-Userscript gratuito e open source para auxiliar o preenchimento da função **Comprar por Lista** no site Liga One Piece.
+Assistente gratuito e open source para preencher automaticamente as decklists ou função **Comprar por Lista** da Liga One Piece.
 
 > Projeto independente, não afiliado, patrocinado ou aprovado pela Liga One Piece.
 
-## Instalação para usuários
+## Instalação fácil
+
+Você não precisa baixar o projeto completo nem entender de programação. Siga os passos abaixo.
 
 ### 1. Instale o Tampermonkey
 
-Instale a extensão Tampermonkey no Chrome, Edge ou Firefox.
+Escolha seu navegador:
+
+- [Instalar no Google Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- [Instalar no Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd)
+- [Instalar no Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/)
+
+O Tampermonkey é a extensão que permite instalar e executar o DeckList Assistant no navegador.
 
 ### 2. Instale o DeckList Assistant
 
-Depois que este repositório estiver publicado, use o link abaixo:
+Com o Tampermonkey instalado, clique no botão abaixo:
 
-```text
-https://raw.githubusercontent.com/luiztraghia/decklist-assistant/main/dist/decklist-assistant.user.js
-```
+## [➡️ Instalar DeckList Assistant](https://raw.githubusercontent.com/luiztraghia/decklist-assistant/main/dist/decklist-assistant.user.js)
 
-Ao abrir o link, o Tampermonkey exibirá a tela de instalação. Clique em **Instalar**.
+O Tampermonkey abrirá uma tela mostrando as informações do programa. Clique em **Instalar**.
 
-### 3. Abra a página Comprar por Lista
+> Se aparecer apenas uma página com código, confirme se o Tampermonkey está instalado e ativado no navegador.
 
-Acesse a função Comprar por Lista e clique no campo de cards. O painel do DeckList Assistant aparecerá na página.
+### 3. Abra a Liga One Piece
 
-### 4. Cole sua lista
+Acesse a página [Comprar por Lista](https://www.ligaonepiece.com.br/?view=cards/lista).
+
+O painel **👒 DeckList Assistant** aparecerá no canto da tela.
+
+### 4. Selecione o campo da Liga
+
+Clique no campo **Adicione a lista de cards** da página. Isso permite que o DeckList Assistant identifique onde deve preencher as cartas.
+
+### 5. Cole sua lista
+
+Use uma carta por linha neste formato (mesmo formato de importação dos simuladores e deckbuilders):
 
 ```text
 4xEB03-053
@@ -32,31 +48,74 @@ Acesse a função Comprar por Lista e clique no campo de cards. O painel do Deck
 2xST30-012
 ```
 
-Confira a validação e clique em **Iniciar preenchimento**.
+O número antes do `x` representa a quantidade desejada. O restante é o código da carta.
 
-## Recursos
+### 6. Inicie o preenchimento
 
-- Validação e normalização da lista.
-- Soma automática de códigos duplicados.
-- Quatro modos simples de velocidade: Muito rápido, Rápido, Médio e Lento.
-- Filtros configuráveis para ignorar Arte Alternativa, Parallel, SP e Manga.
-- Relatório e repetição das falhas.
-- Contato e doações PIX.
-- Atualizações por GitHub Releases e mecanismo nativo do Tampermonkey.
+Clique em **Iniciar preenchimento** e acompanhe o progresso na aba **Execução**.
 
-## Como publicar no GitHub
+No primeiro uso, faça um teste com apenas duas ou três cartas e selecione a velocidade **Médio**. Se tudo funcionar corretamente, você poderá experimentar as velocidades mais rápidas.
 
-O passo a passo completo está em [`docs/PUBLICAR_NO_GITHUB.md`](docs/PUBLICAR_NO_GITHUB.md).
+## Configurações
 
-Resumo:
+Na aba **Configurações**, você pode escolher:
 
-1. Crie um repositório público chamado `decklist-assistant`.
-2. Envie todos os arquivos desta pasta.
-3. Rode `npm install` e `npm run build`.
-4. Faça commit da pasta `dist`.
-5. Crie uma tag como `v6.1.0`; o GitHub Actions criará a Release.
+- Muito rápido;
+- Rápido;
+- Médio;
+- Lento.
 
-## Desenvolvimento
+Também é possível ignorar individualmente:
+
+- Arte Alternativa;
+- Parallel;
+- SP;
+- Manga.
+
+As velocidades mais rápidas podem falhar quando o site ou a conexão estiverem lentos. Nesse caso, use **Médio** ou **Lento**.
+
+## Como atualizar
+
+O DeckList Assistant procura novas versões no GitHub.
+
+1. Abra a aba **Atualizações** no painel.
+2. Clique em **Buscar atualizações**.
+3. Quando uma nova versão aparecer, clique em **Instalar atualização**.
+4. O Tampermonkey abrirá a tela da nova versão.
+5. Clique em **Atualizar** ou **Instalar**.
+6. Volte à página da Liga e atualize a página.
+
+Se o botão de instalação não aparecer, clique em **Abrir lançamento**, abra o arquivo `.user.js` da versão e confirme a atualização no Tampermonkey.
+
+## Privacidade e segurança
+
+- Não acessa senhas;
+- Não lê dados de pagamento;
+- Não envia informações para servidores externos;
+- Funciona localmente no navegador;
+- Atua na página da Liga One Piece;
+- Possui código aberto para consulta da comunidade.
+
+## Problemas comuns
+
+### O painel não apareceu
+
+- Confirme se o Tampermonkey está ativado;
+- Confirme se o DeckList Assistant aparece como ativado no painel do Tampermonkey;
+- Atualize a página da Liga com `Ctrl + F5`.
+
+### As sugestões de cartas não aparecem
+
+- Clique novamente no campo **Adicione a lista de cards**;
+- Use a velocidade **Médio** ou **Lento**;
+- Teste inicialmente com uma única carta;
+- Verifique se o código está correto.
+
+### A atualização apresenta erro 404
+
+Isso normalmente significa que a nova versão ainda não foi publicada como uma Release pública no GitHub. Tente novamente mais tarde ou consulte a página de [Releases](https://github.com/luiztraghia/decklist-assistant/releases).
+
+## Para desenvolvedores
 
 Requisitos: Node.js 22 e npm.
 
@@ -73,21 +132,20 @@ O arquivo distribuível é gerado em:
 dist/decklist-assistant.user.js
 ```
 
-## Atualizações
-
-Há duas formas complementares:
-
-1. O programa consulta a última Release pública pela API do GitHub ao iniciar e ao clicar em **Buscar atualizações**.
-2. O cabeçalho do userscript contém `@updateURL` e `@downloadURL`, permitindo que o Tampermonkey verifique o arquivo hospedado no GitHub.
-
-## Privacidade
-
-A lista permanece na página e a preferência de velocidade fica no navegador. O programa não lê senhas ou dados de pagamento e não envia listas para servidores externos.
+As instruções de publicação estão em [`docs/PUBLICAR_NO_GITHUB.md`](docs/PUBLICAR_NO_GITHUB.md).
 
 ## Contato
 
-`luiz.traghia@gmail.com`
+Encontrou um problema, tem uma sugestão ou deseja deixar um elogio?
+
+E-mail: `luiz.traghia@gmail.com`
+
+## Apoie o projeto
+
+Este projeto é gratuito e open source. Se ele economizou seu tempo, considere me ajudar a terminar meu deck. 😊
+
+Chave PIX: luiz.traghia@gmail.com
 
 ## Licença
 
-MIT. Consulte [`LICENSE`](LICENSE).
+Distribuído sob a licença MIT. Consulte o arquivo [`LICENSE`](LICENSE).
