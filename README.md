@@ -130,8 +130,6 @@ O arquivo distribuível é gerado em:
 dist/decklist-assistant.user.js
 ```
 
-As instruções de publicação estão em [`docs/PUBLICAR_NO_GITHUB.md`](docs/PUBLICAR_NO_GITHUB.md).
-
 ## Contato
 
 Encontrou um problema, tem uma sugestão ou deseja deixar um elogio?
